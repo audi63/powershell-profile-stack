@@ -120,19 +120,19 @@ Le menu se redessine en place (un seul bloc ANSI, pas d'empilement).
 
 | Commande | Destination |
 |---|---|
-| `dev` | `C:\Users\Johan\TRAVAUX\PROJETS` |
-| `sites` | `C:\Users\Johan\TRAVAUX\SITES` |
-| `plugins` | `C:\Users\Johan\TRAVAUX\PLUGINS` |
-| `projets` | `C:\Users\Johan\Projets` |
-| `cortex` | `C:\Users\Johan\SecondBrain\Cortex` |
+| `dev` | `$env:USERPROFILE\TRAVAUX\PROJETS` |
+| `sites` | `$env:USERPROFILE\TRAVAUX\SITES` |
+| `plugins` | `$env:USERPROFILE\TRAVAUX\PLUGINS` |
+| `projets` | `$env:USERPROFILE\Projets` |
+| `obsidian` | `$env:USERPROFILE\Obsidian` |
 | `codehere` / `ch` | Ouvrir VS Code dans le dossier courant |
 | `z <mot-cle>` | Navigation intelligente zoxide |
 
 ### zoxide
 
 zoxide apprend les repertoires visites et permet d'y sauter par mot-cle :
-- `z cortex` → saute dans le dossier Cortex
-- `z toilettage` → saute dans le projet toilettage
+- `z obsidian` → saute dans le vault Obsidian
+- `z monprojet` → saute dans un projet visite precedemment
 - `zi` → mode interactif avec fzf
 
 ## Utilitaires systeme
@@ -172,12 +172,12 @@ Format : `[ADMIN] ~/chemin (branche-git) > `
 - `[ADMIN]` en rouge si console administrateur
 - Chemin avec `~` pour le home
 - Branche Git en jaune si dans un repo
-- Titre fenetre : `PowerShell 7.6 — Admin (JConcept)` ou `PowerShell 7.6 — Johan`
+- Titre fenetre : `PowerShell 7.6 — Admin` ou `PowerShell 7.6`
 
 ## SSH
 
-Deux cles chargees automatiquement au demarrage :
-- `~/.ssh/id_ed25519` — GitHub
-- `~/.ssh/id_ed25519_ubuntu` — Ubuntu dev (homelab)
+Les cles SSH listees dans le profil sont chargees automatiquement au demarrage. Par defaut :
+- `~/.ssh/id_ed25519` — cle principale
+- `~/.ssh/id_ed25519_ubuntu` — cle secondaire (optionnelle)
 
-Chargement intelligent : verifie si la cle est deja dans l'agent avant d'appeler `ssh-add`.
+Adapter la liste `$sshKeys` dans le profil selon vos cles. Chargement intelligent : verifie si la cle est deja dans l'agent avant d'appeler `ssh-add`.

@@ -19,22 +19,17 @@ Profil complet avec menu interactif natif, palette ANSI true color, integration 
 
 ## Apercu
 
-```
-Menu principal  (↑↓ Entree Echap)
+### Show-Menu (F1) — Aide-memoire statique
 
-  → Claude Code       (bleu royal)
-    Codex CLI          (bleu ciel)
-    Gemini CLI         (cyan)
-    Ollama             (turquoise)
-    Docker             (vert emeraude)
-    WSL Ubuntu         (vert citron)
-    FlyEnv             (jaune)
-    Git                (ambre)
-    Switch-Admin       (orange)
-    Show-Env           (rouge corail)
-    Settings           (rose)
-    Help               (blanc)
-```
+![Show-Menu](docs/screenshots/show-menu.png)
+
+### Menu interactif `m` (Ctrl+M) — Navigation clavier
+
+![Menu interactif](docs/screenshots/menu-interactif.png)
+
+### Navigation et execution
+
+![Navigation et Help](docs/screenshots/menu-navigation-help.png)
 
 ## Structure du projet
 
@@ -124,7 +119,7 @@ Le script installe automatiquement :
 
 ## Auteur
 
-**Johan** — [@audi63](https://github.com/audi63)
+[@audi63](https://github.com/audi63)
 
 ## Licence
 

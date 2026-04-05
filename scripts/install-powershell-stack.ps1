@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Installation complète de la stack terminal PowerShell — Johan (JConcept)
+    Installation complete de la stack terminal PowerShell
 
 .DESCRIPTION
     Script idempotent pour (re)installer toute la stack PowerShell après une
@@ -25,7 +25,7 @@
     Enregistrer le coffre SecretStore après installation.
 
 .PARAMETER ProfileSource
-    Chemin vers le profil à déployer. Défaut : Cortex backup.
+    Chemin vers le profil à déployer. Défaut : backup Obsidian.
 
 .PARAMETER UseChocolateyFallback
     Utiliser Chocolatey si winget échoue.
@@ -236,18 +236,18 @@ function Deploy-Profile {
         $source = $ProfileSource
         Write-Info "Source profil : parametre ($ProfileSource)"
     } else {
-        # Chercher le backup Cortex
-        $cortexPaths = @(
-            "$env:USERPROFILE\SecondBrain\Cortex\05-system\scripts\Microsoft.PowerShell_profile.ps1"
-            "C:\Users\Johan\SecondBrain\Cortex\05-system\scripts\Microsoft.PowerShell_profile.ps1"
+        # Chercher le backup Obsidian vault ou le script local
+        $backupPaths = @(
+            "$env:USERPROFILE\Obsidian\05-system\scripts\Microsoft.PowerShell_profile.ps1"
+            "$PSScriptRoot\Microsoft.PowerShell_profile.ps1"
         )
-        foreach ($p in $cortexPaths) {
-            if (Test-Path $p) { $source = $p; Write-Info "Source profil : Cortex ($p)"; break }
+        foreach ($p in $backupPaths) {
+            if (Test-Path $p) { $source = $p; Write-Info "Source profil : $p"; break }
         }
     }
 
     if (-not $source) {
-        Write-WarnMsg 'Aucune source de profil trouvee (ni parametre, ni Cortex).'
+        Write-WarnMsg 'Aucune source de profil trouvee (ni parametre, ni backup Obsidian).'
         Write-WarnMsg 'Utilise -ProfileSource pour specifier le chemin du profil.'
         return
     }

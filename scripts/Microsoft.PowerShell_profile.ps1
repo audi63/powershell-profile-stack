@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════
-# PowerShell 7.6 — Profil Johan (JConcept)
+# PowerShell 7.6 — Profil personnalise
 # Dernière mise à jour : 2026-04-05
 # ═══════════════════════════════════════════════════════════════════
 
@@ -128,7 +128,7 @@ if ((Test-Path $npmGlobal) -and ($env:PATH -notmatch [regex]::Escape($npmGlobal)
 # ──────────────────────────────────────
 # Python
 # ──────────────────────────────────────
-$pythonPath = "C:\Python313\python.exe"
+$pythonPath = "C:\Python313\python.exe"  # ← adapter si necessaire
 if (Test-Path $pythonPath) {
     $env:PYTHON = $pythonPath
 }
@@ -140,9 +140,9 @@ $global:IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.Wind
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 if ($IsAdmin) {
-    $Host.UI.RawUI.WindowTitle = "PowerShell 7.6 — Admin (JConcept)"
+    $Host.UI.RawUI.WindowTitle = "PowerShell 7.6 — Admin"
 } else {
-    $Host.UI.RawUI.WindowTitle = "PowerShell 7.6 — Johan"
+    $Host.UI.RawUI.WindowTitle = "PowerShell 7.6"
 }
 
 # ──────────────────────────────────────
@@ -296,7 +296,7 @@ function wsl-menu {
 # 6. FlyEnv
 # ──────────────────────────────────────
 function flyenv-start {
-    $flyenvPath = "C:\Users\Johan\Projets\FlyEnv\PhpWebStudy\PhpWebStudy.exe"
+    $flyenvPath = "$env:USERPROFILE\Projets\FlyEnv\PhpWebStudy\PhpWebStudy.exe"  # ← adapter le chemin
     if (Test-Path $flyenvPath) { Start-Process $flyenvPath }
     else { Write-Host "FlyEnv introuvable : $flyenvPath" -ForegroundColor Yellow }
 }
@@ -304,7 +304,6 @@ function flyenv-menu {
     $c = $TC.FlyEnv; $t = $TC.Text; $d = $TC.Dim; $r = $TC.R
     Write-Host "`n${c}══════ FlyEnv ══════${r}"
     Write-Host "  ${c}flyenv-start${r} ${t}— Lancer FlyEnv (PhpWebStudy)${r}"
-    Write-Host "  ${d}Chemin : C:\Users\Johan\Projets\FlyEnv\${r}"
     Write-Host "${c}════════════════════${r}`n"
 }
 
@@ -351,11 +350,12 @@ function git-menu {
 # ──────────────────────────────────────
 # Navigation rapide
 # ──────────────────────────────────────
-function dev      { Set-Location "C:\Users\Johan\TRAVAUX\PROJETS" }
-function sites    { Set-Location "C:\Users\Johan\TRAVAUX\SITES" }
-function plugins  { Set-Location "C:\Users\Johan\TRAVAUX\PLUGINS" }
-function projets  { Set-Location "C:\Users\Johan\Projets" }
-function cortex   { Set-Location "C:\Users\Johan\SecondBrain\Cortex" }
+# ── Adapter ces chemins a votre environnement ──
+function dev      { Set-Location "$env:USERPROFILE\TRAVAUX\PROJETS" }
+function sites    { Set-Location "$env:USERPROFILE\TRAVAUX\SITES" }
+function plugins  { Set-Location "$env:USERPROFILE\TRAVAUX\PLUGINS" }
+function projets  { Set-Location "$env:USERPROFILE\Projets" }
+function obsidian { Set-Location "$env:USERPROFILE\Obsidian" }    # ← adapter au chemin de votre vault
 function codehere { code . }
 Set-Alias ch codehere
 
@@ -419,7 +419,7 @@ function Help {
     Write-Host "  ${t}git-etat git-log git-diff git-add git-pull git-push${r}"
     Write-Host ""
     Write-Host "  ${d}Navigation${r}"
-    Write-Host "  ${t}dev sites plugins projets cortex codehere (ch)${r}"
+    Write-Host "  ${t}dev sites plugins projets obsidian codehere (ch)${r}"
     Write-Host "  ${t}z <mot-cle> (zoxide — navigation intelligente)${r}"
     Write-Host ""
     Write-Host "  ${d}Systeme${r}"
@@ -625,7 +625,7 @@ function m {
 
 # ──────────────────────────────────────
 # zoxide — navigation intelligente (toujours en fin de profil)
-# Utiliser : z projets, z cortex, z toilettage...
+# Utiliser : z projets, z obsidian, z monprojet...
 # ──────────────────────────────────────
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     try {

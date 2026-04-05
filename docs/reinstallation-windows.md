@@ -27,17 +27,17 @@ winget install Microsoft.PowerShell
 
 Fermer et rouvrir le terminal. Verifier : `pwsh --version` → `PowerShell 7.6.x`
 
-### 3. Restaurer Cortex (si disponible)
+### 3. Restaurer depuis un vault Obsidian (si disponible)
 
-Si le vault Cortex est restaure depuis une sauvegarde :
+Si votre vault Obsidian contient une sauvegarde du profil :
 
 ```powershell
-& "$env:USERPROFILE\SecondBrain\Cortex\05-system\scripts\install-powershell-stack.ps1"
+& "$env:USERPROFILE\Obsidian\scripts\install-powershell-stack.ps1"
 ```
 
 ### 4. Installation depuis le repo Git
 
-Si Cortex n'est pas encore restaure :
+Si le vault n'est pas encore restaure :
 
 ```powershell
 # Installer git si necessaire
@@ -63,10 +63,10 @@ PS 7.6.0 | SSH: 0 cle(s) | user | F1 = menu | Ctrl+M = interactif | Ctrl+R = his
 
 ```powershell
 # Generer une cle GitHub
-ssh-keygen -t ed25519 -C "johan.coffigniez@gmail.com" -f "$env:USERPROFILE\.ssh\id_ed25519"
+ssh-keygen -t ed25519 -C "your-email@example.com" -f "$env:USERPROFILE\.ssh\id_ed25519"
 
-# Generer une cle Ubuntu
-ssh-keygen -t ed25519 -C "ubuntu-dev" -f "$env:USERPROFILE\.ssh\id_ed25519_ubuntu"
+# Generer une cle secondaire (optionnel)
+ssh-keygen -t ed25519 -C "secondary-key" -f "$env:USERPROFILE\.ssh\id_ed25519_secondary"
 
 # Ajouter la cle publique sur GitHub
 cat "$env:USERPROFILE\.ssh\id_ed25519.pub" | clip

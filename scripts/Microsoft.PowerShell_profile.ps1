@@ -40,46 +40,28 @@ try {
 }
 
 # ──────────────────────────────────────
-# PSFzf — fuzzy search clavier (apres PSReadLine)
-# Ctrl+R = historique fuzzy, Ctrl+T = fichiers
+# Modules différés (chargés au premier idle pour profil rapide)
+# PSFzf, Terminal-Icons, SecretManagement, Chocolatey
 # ──────────────────────────────────────
-if ((Get-Module -ListAvailable PSFzf) -and (Get-Command fzf -ErrorAction SilentlyContinue)) {
-    try {
-        Import-Module PSFzf -ErrorAction Stop
-        Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
-    } catch {
-        Write-Host "[profil] PSFzf non disponible : $_" -ForegroundColor DarkYellow
+Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -MaxTriggerCount 1 -Action {
+    # PSFzf — Ctrl+R historique fuzzy, Ctrl+T fichiers
+    if (Get-Command fzf -ErrorAction SilentlyContinue) {
+        try {
+            Import-Module PSFzf -ErrorAction Stop
+            Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+        } catch {}
     }
-}
-
-# ──────────────────────────────────────
-# SecretManagement — coffre de secrets
-# ──────────────────────────────────────
-if (Get-Module -ListAvailable Microsoft.PowerShell.SecretManagement) {
-    Import-Module Microsoft.PowerShell.SecretManagement -ErrorAction SilentlyContinue
-}
-if (Get-Module -ListAvailable Microsoft.PowerShell.SecretStore) {
-    Import-Module Microsoft.PowerShell.SecretStore -ErrorAction SilentlyContinue
-}
-
-# ──────────────────────────────────────
-# Terminal-Icons — icones dans ls (Nerd Font requise)
-# ──────────────────────────────────────
-if (Get-Module -ListAvailable Terminal-Icons) {
+    # Terminal-Icons — icones dans ls (Nerd Font requise)
+    try { Import-Module Terminal-Icons -ErrorAction SilentlyContinue } catch {}
+    # SecretManagement
     try {
-        Import-Module Terminal-Icons -ErrorAction Stop
-    } catch {
-        Write-Host "[profil] Terminal-Icons non disponible : $_" -ForegroundColor DarkYellow
-    }
-}
-
-# ──────────────────────────────────────
-# Chocolatey
-# ──────────────────────────────────────
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path $ChocolateyProfile) {
-    Import-Module $ChocolateyProfile -ErrorAction SilentlyContinue
-}
+        Import-Module Microsoft.PowerShell.SecretManagement -ErrorAction SilentlyContinue
+        Import-Module Microsoft.PowerShell.SecretStore -ErrorAction SilentlyContinue
+    } catch {}
+    # Chocolatey
+    $choco = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+    if (Test-Path $choco) { Import-Module $choco -ErrorAction SilentlyContinue }
+} | Out-Null
 
 # ──────────────────────────────────────
 # SSH Agent + Clés automatiques
@@ -98,8 +80,6 @@ if (Get-Service ssh-agent -ErrorAction SilentlyContinue) {
     $loadedKeys = ssh-add -l 2>$null
     foreach ($key in $sshKeys) {
         if (Test-Path $key) {
-            $keyName = Split-Path $key -Leaf
-            # Vérifier si la clé est déjà chargée (évite le prompt)
             $pubKey = "$key.pub"
             if ((Test-Path $pubKey) -and $loadedKeys -and ($loadedKeys | Select-String -SimpleMatch (Get-Content $pubKey).Split(" ")[1] -Quiet)) {
                 # Clé déjà chargée
@@ -108,13 +88,19 @@ if (Get-Service ssh-agent -ErrorAction SilentlyContinue) {
             }
         }
     }
+    # Stocker le compte pour le message de bienvenue (évite un 2ème appel ssh-add)
+    $script:sshKeyCount = (ssh-add -l 2>$null | Measure-Object).Count
 }
 
 # ──────────────────────────────────────
-# FNM (Fast Node Manager)
+# FNM (Fast Node Manager) — sortie cachée
 # ──────────────────────────────────────
 if (Get-Command fnm -ErrorAction SilentlyContinue) {
-    fnm env --use-on-cd --shell power-shell | Out-String | Invoke-Expression
+    $fnmCache = "$env:TEMP\fnm-env-cache.ps1"
+    if (-not (Test-Path $fnmCache) -or ((Get-Date) - (Get-Item $fnmCache).LastWriteTime).TotalHours -gt 12) {
+        fnm env --use-on-cd --shell power-shell | Set-Content $fnmCache -Force
+    }
+    . $fnmCache
 }
 
 # ──────────────────────────────────────
@@ -628,15 +614,14 @@ function m {
 # Utiliser : z projets, z obsidian, z monprojet...
 # ──────────────────────────────────────
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
-    try {
-        Invoke-Expression (& { zoxide init powershell | Out-String })
-    } catch {
-        Write-Host "[profil] zoxide non disponible : $_" -ForegroundColor DarkYellow
+    $zoxideCache = "$env:TEMP\zoxide-init-cache.ps1"
+    if (-not (Test-Path $zoxideCache) -or ((Get-Date) - (Get-Item $zoxideCache).LastWriteTime).TotalDays -gt 7) {
+        zoxide init powershell | Set-Content $zoxideCache -Force
     }
+    . $zoxideCache
 }
 
 # ──────────────────────────────────────
-# Message de bienvenue
+# Message de bienvenue (réutilise $sshKeyCount calculé lors du chargement SSH)
 # ──────────────────────────────────────
-$sshCount = (ssh-add -l 2>$null | Measure-Object).Count
-Write-Host "$($TC.Dim)PS $($PSVersionTable.PSVersion) | SSH: ${sshCount} cle(s) | $(if($IsAdmin){'ADMIN'}else{'user'}) | F1 = menu | Ctrl+M = interactif | Ctrl+R = historique$($TC.R)"
+Write-Host "$($TC.Dim)PS $($PSVersionTable.PSVersion) | SSH: $($script:sshKeyCount) cle(s) | $(if($IsAdmin){'ADMIN'}else{'user'}) | F1 = menu | Ctrl+M = interactif | Ctrl+R = historique$($TC.R)"
